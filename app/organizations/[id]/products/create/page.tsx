@@ -9,9 +9,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
 import { useRouter, useParams } from "next/navigation"
 import { useState } from "react"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Leaf } from "lucide-react"
 import Link from "next/link"
 
 export default function CreateProductPage() {
@@ -25,6 +26,9 @@ export default function CreateProductPage() {
   const [unit, setUnit] = useState("")
   const [location, setLocation] = useState("")
   const [imageUrl, setImageUrl] = useState("")
+  const [isSurplus, setIsSurplus] = useState(false)
+  const [surplusReason, setSurplusReason] = useState<"excess" | "imperfect" | "urgent" | null>(null)
+  const [discountPercentage, setDiscountPercentage] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
@@ -53,6 +57,9 @@ export default function CreateProductPage() {
         unit,
         location,
         image_url: imageUrl || null,
+        is_surplus: isSurplus,
+        surplus_reason: isSurplus ? surplusReason : null,
+        discount_percentage: isSurplus && discountPercentage ? Number.parseInt(discountPercentage) : null,
         created_by: user.id,
       })
 
@@ -180,6 +187,56 @@ export default function CreateProductPage() {
                     onChange={(e) => setImageUrl(e.target.value)}
                   />
                   <p className="text-xs text-muted-foreground">Enter a URL to an image of your product (optional)</p>
+                </div>
+
+                <div className="border-t pt-6">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <Checkbox id="surplus" checked={isSurplus} onCheckedChange={(checked) => setIsSurplus(!!checked)} />
+                    <Label htmlFor="surplus" className="flex items-center gap-2 cursor-pointer">
+                      <Leaf className="h-4 w-4 text-orange-600" />
+                      <span>Mark as Surplus Item (Waste Reduction)</span>
+                    </Label>
+                  </div>
+
+                  {isSurplus && (
+                    <div className="space-y-4 bg-orange-50 p-4 rounded-lg border border-orange-200">
+                      <p className="text-sm text-orange-900">
+                        Surplus items help reduce waste and are featured in the dedicated Surplus Marketplace
+                      </p>
+
+                      <div className="grid gap-2">
+                        <Label htmlFor="surplus_reason">Surplus Reason</Label>
+                        <Select
+                          value={surplusReason || ""}
+                          onValueChange={(value: any) => setSurplusReason(value)}
+                          required={isSurplus}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select reason" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="excess">Excess Inventory</SelectItem>
+                            <SelectItem value="imperfect">Cosmetically Imperfect</SelectItem>
+                            <SelectItem value="urgent">Urgent Sale Needed</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="grid gap-2">
+                        <Label htmlFor="discount">Discount Percentage (Optional)</Label>
+                        <Input
+                          id="discount"
+                          type="number"
+                          min="0"
+                          max="100"
+                          placeholder="e.g., 20"
+                          value={discountPercentage}
+                          onChange={(e) => setDiscountPercentage(e.target.value)}
+                        />
+                        <p className="text-xs text-orange-700">Offering a discount helps move surplus items faster</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {error && <p className="text-sm text-destructive">{error}</p>}

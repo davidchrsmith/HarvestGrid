@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
-import { MapPin, Package, Sprout } from "lucide-react"
+import { MapPin, Package, Sprout, Leaf, ArrowRight } from "lucide-react"
 import Image from "next/image"
 
 export default async function ProductsPage() {
@@ -18,7 +18,6 @@ export default async function ProductsPage() {
     redirect("/auth/login")
   }
 
-  // Get all available products
   const { data: products } = await supabase
     .from("products")
     .select(
@@ -32,6 +31,7 @@ export default async function ProductsPage() {
     `,
     )
     .eq("available", true)
+    .eq("is_surplus", false)
     .order("created_at", { ascending: false })
 
   return (
@@ -46,24 +46,52 @@ export default async function ProductsPage() {
             <Button variant="ghost" asChild>
               <Link href="/dashboard">Dashboard</Link>
             </Button>
+            <Button variant="ghost" asChild>
+              <Link href="/surplus">
+                <Leaf className="mr-2 h-4 w-4" />
+                Surplus
+              </Link>
+            </Button>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto p-6">
+      <main className="container mx-auto p-6 max-w-7xl">
         <div className="mb-8">
-          <h1 className="mb-2 text-3xl font-bold text-green-900">Browse Products</h1>
-          <p className="text-muted-foreground">Discover fresh produce, meat, and dairy from local farms</p>
+          <h1 className="mb-2 text-4xl font-bold text-green-900">Available Supply</h1>
+          <p className="text-lg text-green-700">
+            Browse current inventory from local farms — or use the Demand Board to plan future supply
+          </p>
+        </div>
+
+        <div className="mb-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
+          <p className="text-sm text-blue-900">
+            <strong>Looking for something specific?</strong> Post your needs on the{" "}
+            <Link href="/demand" className="underline font-medium">
+              Demand Board
+            </Link>{" "}
+            and farms will respond with offers. For discounted surplus items, visit the{" "}
+            <Link href="/surplus" className="underline font-medium">
+              Surplus Marketplace
+            </Link>
+            .
+          </p>
         </div>
 
         {!products || products.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <Package className="mb-4 h-12 w-12 text-muted-foreground" />
-              <h3 className="mb-2 text-lg font-semibold">No products available</h3>
-              <p className="text-center text-sm text-muted-foreground">
-                Check back later for new listings from local farms.
+              <h3 className="mb-2 text-lg font-semibold">No products available right now</h3>
+              <p className="text-center text-sm text-muted-foreground mb-4">
+                Use the Demand Board to plan future supply needs instead
               </p>
+              <Button asChild>
+                <Link href="/demand">
+                  Go to Demand Board
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
             </CardContent>
           </Card>
         ) : (

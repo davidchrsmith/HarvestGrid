@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
-import { Mail, MailOpen, Sprout } from "lucide-react"
+import { Mail, MailOpen, Sprout, ClipboardList } from "lucide-react"
 
 export default async function MessagesPage() {
   const supabase = await createClient()
@@ -62,16 +62,19 @@ export default async function MessagesPage() {
               <Link href="/dashboard">Dashboard</Link>
             </Button>
             <Button variant="ghost" asChild>
-              <Link href="/products">Browse Products</Link>
+              <Link href="/demand">
+                <ClipboardList className="mr-2 h-4 w-4" />
+                Demand Board
+              </Link>
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto p-6">
+      <main className="container mx-auto p-6 max-w-4xl">
         <div className="mb-8">
-          <h1 className="mb-2 text-3xl font-bold text-green-900">Messages</h1>
-          <p className="text-muted-foreground">View and manage your conversations</p>
+          <h1 className="mb-2 text-4xl font-bold text-green-900">Partner Communications</h1>
+          <p className="text-lg text-green-700">Coordinate with farms and restaurants about orders and commitments</p>
         </div>
 
         {!messages || messages.length === 0 ? (
@@ -79,9 +82,12 @@ export default async function MessagesPage() {
             <CardContent className="flex flex-col items-center justify-center py-12">
               <Mail className="mb-4 h-12 w-12 text-muted-foreground" />
               <h3 className="mb-2 text-lg font-semibold">No messages yet</h3>
-              <p className="text-center text-sm text-muted-foreground">
-                Start a conversation by contacting a farm about their products.
+              <p className="text-center text-sm text-muted-foreground mb-4">
+                Start coordinating by responding to demand requests or contacting partners about products.
               </p>
+              <Button asChild>
+                <Link href="/demand">View Demand Board</Link>
+              </Button>
             </CardContent>
           </Card>
         ) : (
@@ -101,6 +107,9 @@ export default async function MessagesPage() {
                         </div>
                         <CardDescription>
                           {isSent ? "To" : "From"}: {otherOrg.name}
+                          <Badge variant="outline" className="ml-2 capitalize">
+                            {otherOrg.type}
+                          </Badge>
                         </CardDescription>
                         {msg.products && <p className="mt-1 text-sm text-muted-foreground">Re: {msg.products.name}</p>}
                       </div>
@@ -112,7 +121,7 @@ export default async function MessagesPage() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <p className="mb-3 text-sm text-muted-foreground line-clamp-2">{msg.message}</p>
+                    <p className="mb-3 text-sm text-gray-700">{msg.message}</p>
                     <p className="text-xs text-muted-foreground">
                       {new Date(msg.created_at).toLocaleDateString()} at {new Date(msg.created_at).toLocaleTimeString()}
                     </p>
