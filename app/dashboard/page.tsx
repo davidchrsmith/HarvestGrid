@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { Building2, Plus, Sprout, Repeat, Leaf, TrendingUp, ArrowRight, ClipboardList } from "lucide-react"
+import { SignoutButton } from "@/components/signout-button"
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -85,11 +86,7 @@ export default async function DashboardPage() {
               <Link href="/messages">Messages</Link>
             </Button>
           </nav>
-          <form action="/auth/signout" method="post">
-            <Button variant="ghost" type="submit">
-              Sign out
-            </Button>
-          </form>
+          <SignoutButton />
         </div>
       </header>
 
